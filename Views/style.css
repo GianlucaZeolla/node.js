@@ -1,0 +1,21 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 2em;
+  background: #f4f4f4;
+}
+form {
+  margin-bottom: 1em;
+}
+input, button {
+  margin: 0.5em 0;
+  padding: 0.5em;
+}
+#products {
+  margin-top: 1em;
+}
+.product {
+  background: #fff;
+  border: 1px solid #ccc;
+  margin-bottom: 1em;
+  padding: 1em;
+}
