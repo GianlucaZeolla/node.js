@@ -15,23 +15,26 @@ async function login(req, res) {
 
   try {
     // Buscar el usuario por correo
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: req.body.email });
+    console.log('user no encontrado en db: ', user)
+
+    console.log(req.body)
 
     if (!user) {
-      return res.status(401).json({ message: 'Usuario o contraseña incorrectos' });
+      return res.status(401).json({ message: 'Usuario incorrectos' });
     }
 
     // Verificar la contraseña
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Usuario o contraseña incorrectos' });
+      return res.status(401).json({ message: 'contraseña incorrectos' });
     }
 
     // Generar el token JWT
     const token = jwt.sign(
       { id: user._id, role: user.role }, // Payload (datos que se incluirán en el token)
-      KEY_SECRETA,                       // Clave secreta
+      keySecreta,                       // Clave secreta
       { expiresIn: '2m' }               // Tiempo de expiración
     );
 

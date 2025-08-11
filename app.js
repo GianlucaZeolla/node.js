@@ -12,8 +12,6 @@ app.use(express.json());
 app.use('/api/User', userRoutes)
 app.use('/api/products', productRoutes)
 
-// filepath: c:\Users\gianl\Documents\proyectoNode\node.js\app.js
-app.use(express.static('Views'));
 
 
 
