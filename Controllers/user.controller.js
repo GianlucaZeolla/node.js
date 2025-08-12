@@ -1,49 +1,43 @@
 const User = require('../Models/user.model');
 const bcrypt = require('bcrypt');
-const saltRounds = 10; 
-
-const jwt = require('jsonwebtoken'); 
+const saltRounds = 10;
+const jwt = require('jsonwebtoken');
+const keySecreta = process.env.keySecreta; // <-- Agregado
 
 
 //generar token
 async function login(req, res) {
     const { email, password } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Faltan campos obligatorios' });
-  }
-
-  try {
-    // Buscar el usuario por correo
-    const user = await User.findOne({ email: req.body.email });
-    console.log('user no encontrado en db: ', user)
-
-    console.log(req.body)
-
-    if (!user) {
-      return res.status(401).json({ message: 'Usuario incorrectos' });
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Faltan campos obligatorios' });
     }
 
-    // Verificar la contraseña
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    try {
+        // Buscar el usuario por correo
+        const user = await User.findOne({ email: email });
+        if (!user) {
+            return res.status(401).json({ message: 'Usuario incorrecto' });
+        }
 
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: 'contraseña incorrectos' });
+        // Verificar la contraseña
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: 'Contraseña incorrecta' });
+        }
+
+        // Generar el token JWT
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            keySecreta,
+            { expiresIn: '2m' }
+        );
+
+        res.json({ message: 'Inicio de sesión exitoso', token });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error en el servidor' });
     }
-
-    // Generar el token JWT
-    const token = jwt.sign(
-      { id: user._id, role: user.role }, // Payload (datos que se incluirán en el token)
-      keySecreta,                       // Clave secreta
-      { expiresIn: '2m' }               // Tiempo de expiración
-    );
-
-    // Enviar el token en la respuesta
-    res.json({ message: 'Inicio de sesión exitoso', token });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error en el servidor' });
-  }
 };
 //eliminar usuario mediante token
 async function deleteUserjwt(req, res) {
@@ -199,6 +193,8 @@ async function updateUser(req, res){
         })
     }
 }
+
+
 
 
 module.exports = {
